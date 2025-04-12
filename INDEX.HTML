@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>No Thanks - Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #reader {
+      width: 300px;
+      margin: auto;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>ইসরায়েলি পণ্য স্ক্যান করুন</h2>
+  <div id="reader"></div>
+  <div id="result"></div>
+
+  <script>
+    function isIsraeliProduct(text) {
+      return text.startsWith("729");
+    }
+
+    function showResult(decodedText) {
+      const resultDiv = document.getElementById("result");
+      if (isIsraeliProduct(decodedText)) {
+        resultDiv.innerText = "No Thanks - ইসরায়েলি পণ্য";
+        resultDiv.style.color = "red";
+      } else {
+        resultDiv.innerText = "এই পণ্য ইসরায়েলি নয়";
+        resultDiv.style.color = "green";
+      }
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        const cameraId = devices[0].id;
+        html5QrCode.start(
+          cameraId,
+          {
+            fps: 10,
+            qrbox: 250
+          },
+          decodedText => {
+            html5QrCode.stop(); // স্ক্যান একবারের জন্য
+            showResult(decodedText);
+          },
+          error => {
+            // কোনো ভুল হলে কিছু না করলেও চলবে
+          }
+        );
+      }
+    }).catch(err => {
+      console.error("ক্যামেরা একসেস পাওয়া যায়নি:", err);
+    });
+  </script>
+</body>
+</html>
